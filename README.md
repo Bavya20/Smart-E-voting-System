@@ -26,14 +26,6 @@ A secure and accessible online voting system where users can cast their votes us
 
 ## 💻 Screenshots
 
-> Add screenshots like this inside a `screenshots/` folder
-
-![Virtual Keyboard Demo](screenshots/keyboard.png)  
-![Gesture Detection](screenshots/gesture.png)
-
----
-## 💻 Screenshots
-
 ### 🖥️ Welcome Page
 > The entry point of the system designed for simplicity and accessibility.
 ![Welcome Page](screenshots/welcome_page.jpeg)
