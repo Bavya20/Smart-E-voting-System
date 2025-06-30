@@ -54,13 +54,15 @@ A secure and accessible online voting system where users can cast their votes us
 
 ### 1. Clone the repo
 
-```bash
+
 git clone https://github.com/Bavya20/Smart-E-voting-System.git
 cd Smart-E-voting-System
 
+---
 
-❤️ Why This Project Matters to me
+## ❤️ Why This Project Matters to me
 
 Elderly and differently-abled people often find it hard to interact with conventional voting systems. This project was born out of a desire to make technology accessible for everyone — especially those often left out.
 
 The goal is to use AI and gesture recognition to create something meaningful and usable in the real world. 🌍
+
