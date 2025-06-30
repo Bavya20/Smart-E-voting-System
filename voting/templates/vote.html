@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <title>Cast Your Vote</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .btn { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
+        #gesture-feed { width: 500px; height: 350px; border: 2px solid black; margin: auto; position: relative; }
+        .party-container { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+        .party { margin: 5px; text-align: center; }
+        .party img { width: 80px; height: 80px; display: block; margin: auto; cursor: pointer; }
+        #selected-party-display { font-size: 20px; font-weight: bold; margin-top: 10px; color: green; }
+    </style>
+</head>
+<body>
+    <h1>Secure Voting System</h1>
+
+    <!-- Aadhaar + Face Verification Form -->
+<form action="{% url 'verify_voter' %}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+    {% csrf_token %}
+    
+    <label for="aadhar">Enter Aadhaar Number:</label>
+    <input type="text" id="aadhar" name="aadhar" placeholder="Enter your 12-digit Aadhaar" required>
+
+    <label for="photo">Upload Your Face Image:</label>
+    <input type="file" id="photo" name="photo" accept="image/*" required>
+
+    <button type="submit" class="btn">✅ Verify</button>
+</form>
+
+<script>
+    function validateForm() {
+        const aadhar = document.getElementById('aadhar').value.trim();
+        const photo = document.getElementById('photo').files[0];
+
+        // Aadhaar validation: 12 digits only
+        const aadharPattern = /^\d{12}$/;
+        if (!aadharPattern.test(aadhar)) {
+            alert("❌ Aadhaar number must be exactly 12 digits.");
+            return false;
+        }
+
+        // Photo validation: must be selected and be an image
+        if (!photo) {
+            alert("❌ Please upload a face photo.");
+            return false;
+        }
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!validTypes.includes(photo.type)) {
+            alert("❌ Only JPG, JPEG, or PNG image files are allowed.");
+            return false;
+        }
+
+        return true; // ✅ All good
+    }
+</script>
+    <div id="gesture-feed">
+        <img id="gestureOutput" src="{% url 'gesture_vote_stream' %}" width="500" height="350">
+    </div>
+
+    <p>Use hand gestures to select your party and nod your head to confirm.</p>
+       
+    <div class="party-container">
+        {% for party in parties %}
+        <div class="party" onclick="selectParty('{{ party }}')">
+            <img src="/static/logos/{{ party|slugify }}.png" alt="{{ party }} Logo">
+            <p>{{ party }}</p>
+
+        </div>
+        {% endfor %}
+	{% for voter_id in aadhaar %}
+	<div class="voter_id" onclick="selectVoter('{{ voter_id }}')">
+            <p> {{ voter_id }} </p>
+	{% endfor %}
+    </div>
+
+
+ <script>
+    let selectedParty = "";
+    let voteSubmitted = false;
+    let voter_id = "";  
+
+    function selectParty(partyName) {
+        selectedParty = partyName;
+        document.getElementById("selected-party-display").innerText = "Selected: " + selectedParty;
+        document.getElementById("selected-party-input").value = selectedParty;
+    }
+    function selectVoter(aadhar) {
+        voter_id = aadhar;
+        document.getElementById("selected-voter").value = voter_id;
+    }
+    // Submit vote using fetch
+        document.getElementById("voteForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // prevent form submission
+
+            if (!selectedParty) {
+                alert("⚠ Please select a party before submitting your vote.");
+                return;
+            }
+            // Get CSRF token safely from DOM
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    const cookies = document.cookie.split(";");
+                    for (let cookie of cookies) {
+                        const trimmed = cookie.trim();
+                        if (trimmed.startsWith(name + "=")) {
+                            cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie("csrftoken");
+		
+            fetch("{% url 'cast_vote' %}", {
+                method: "POST",
+                headers: {
+             "Content-Type": "application/json",
+             "X-CSRFToken": csrftoken
+            },
+                body: JSON.stringify({ party: selectedParty, voter_id: voter_id})
+
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == "success") {
+                    window.location.href = "{% url 'thank_you' %}";
+                } else {
+                    alert("❌ " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong while submitting your vote.");
+            });
+        });
+
+        // Gesture + nod detection every 2s
+        function checkGesture() {
+            fetch('/detect_gesture/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        selectParty(data.party);
+                    }
+                });
+// Nod detection for auto submission
+        fetch('/detect_nod/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.nod_detected && selectedParty !== "") {
+                    submitVote();
+                }
+            });
+    }
+</script>
+
+</script>
+        // Check for gestures and nods every 2 seconds
+        setInterval(checkGesture, 2000);
+    </script>
+<script>
+    setInterval(function () {
+        fetch('/vote_status/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.vote_submitted) {
+                    window.location.href = '/thankyou/';
+                }
+            });
+    }, 2000);  // Check every 2 seconds
+</script>
+</body>
+</html>

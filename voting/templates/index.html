@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <title>Welcome to Elections</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        .btn { padding: 15px 30px; font-size: 18px; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Elections</h1>
+    <img src="/static/eci_logo.png" alt="Election Commission Logo" width="200">
+    <p>Have you already cast your vote?</p>
+    
+    <!-- Button for new voters to register -->
+    <button class="btn" onclick="location.href='/register'">I am a first-time voter</button>
+
+    <!-- Buttons for voting and already voted -->
+    <button class="btn" onclick="location.href='/check'">Gesture Voting</button>
+    <button class="btn" onclick="location.href='/vote1'">Normal Voting</button>
+    <button class="btn" onclick="location.href='/thankyou'">Yes, I have voted</button>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Voting System</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2ecc71;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .message.success {
+            background-color: #e0f8ec;
+            color: #27ae60;
+        }
+
+        .message.error {
+            background-color: #fbeaea;
+            color: #e74c3c;
+        }
+
+        .party-container {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .party {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .party img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .party img:hover {
+            transform: scale(1.1);
+        }
+
+        .party p {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+    </style>
+
+    <script>
+        function selectParty(party) {
+            document.getElementById('Party_name').value = party;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Vote for Your Party_name</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="voter_id">Voter ID</label>
+            <input type="text" name="voter_id" id="voter_id" required>
+            <label for="voter_name">Voter Name</label>
+            <input type="text" name="voter_name" id="voter_name" required>
+            <label for="age">Age</label>
+            <input type="text" name="age" id="age" required>
+
+            <label for="Party_name">Select Party_name</label>
+            <select name="Party_name" id="Party_name" required>
+                <option value="">-- Choose a Party_name --</option>
+                <option value="BJP">BJP</option>
+                <option value="Congress">Congress</option>
+                <option value="AAP">AAP</option>
+                <option value="TMC">TMC</option>
+                <option value="Shiv Sena">Shiv Sena</option>
+                <option value="SP">SP</option>
+                <option value="BSP">BSP</option>
+                <option value="CPI">CPI</option>
+                <option value="NOTA">NOTA</option>
+            </select>
+
+            <button type="submit">Submit Vote</button>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </form>
+
+        <!-- Party Logos Row -->
+        <div class="party-container">
+            <div class="party" onclick="selectParty('BJP')">
+                <img src="/static/logos/bjp.png" alt="BJP Logo">
+                <p>BJP</p>
+            </div>
+            <div class="party" onclick="selectParty('Congress')">
+                <img src="/static/logos/congress.png" alt="Congress Logo">
+                <p>Congress</p>
+            </div>
+            <div class="party" onclick="selectParty('AAP')">
+                <img src="/static/logos/aap.png" alt="AAP Logo">
+                <p>AAP</p>
+            </div>
+            <div class="party" onclick="selectParty('TMC')">
+                <img src="/static/logos/tmc.png" alt="TMC Logo">
+                <p>TMC</p>
+            </div>
+            <div class="party" onclick="selectParty('Shiv Sena')">
+                <img src="/static/logos/shivsena.png" alt="Shiv Sena Logo">
+                <p>Shiv Sena</p>
+            </div>
+            <div class="party" onclick="selectParty('SP')">
+                <img src="/static/logos/sp.png" alt="SP Logo">
+                <p>SP</p>
+            </div>
+            <div class="party" onclick="selectParty('BSP')">
+                <img src="/static/logos/bsp.png" alt="BSP Logo">
+                <p>BSP</p>
+            </div>
+            <div class="party" onclick="selectParty('CPI')">
+                <img src="/static/logos/cpi.png" alt="CPI Logo">
+                <p>CPI</p>
+            </div>
+            <div class="party" onclick="selectParty('NOTA')">
+                <img src="/static/logos/nota.png" alt="NOTA Logo">
+                <p>NOTA</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

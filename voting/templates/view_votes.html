@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Votes</title>
+</head>
+<body>
+    <h2>Stored Votes</h2>
+    {% if votes %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Voter ID</th>
+                <th>Voter Name</th>
+                <th>Age</th>
+                <th>Party_name</th>
+            </tr>
+            {% for vote in votes %}
+            <tr>
+                <td>{{ vote.VoterID }}</td>
+                <td>{{ vote.VoterName }}</td>
+                <td>{{ vote.Age }}</td>
+                <td>{{ vote.Party_name }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No votes found.</p>
+    {% endif %}
+    <br>
+    <a href="/">Go back to vote</a>
+</body>
+</html>

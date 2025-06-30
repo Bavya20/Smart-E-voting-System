@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Voter Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(120deg, #e0f7fa, #f8f9fa);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h2 {
+            color: #00796b;
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: left;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .btn {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #004d40;
+        }
+        #photo-preview {
+            margin-top: 10px;
+            display: none;
+            border-radius: 8px;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 2px solid #00796b;
+        }
+        video {
+            margin-top: 10px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 100%;
+        }
+        canvas {
+            display: none;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .valid-message {
+            color: green;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Voter Verification</h2>
+        <form action="{% url 'verify_voter' %}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+    {% csrf_token %}
+
+    <label for="aadhar">Enter Aadhaar Number:</label>
+    <input type="text" id="aadhar" name="aadhaar_number" placeholder="12-digit Aadhaar" required>
+
+    <label for="photo">Upload Aadhaar Face Image:</label>
+    <input type="file" id="photo" name="face_photo" accept="image/*" required>
+
+    <label>Capture Live Face Image:</label>
+    <video id="video" autoplay playsinline></video>
+    <button type="button" class="btn" onclick="capture()">📸 Capture Face</button>
+    <canvas id="canvas" width="320" height="240"></canvas>
+    <input type="hidden" name="live_image" id="live_image_input">
+
+    <button type="submit" class="btn">✅ Verify</button>
+</form>
+
+    </div>
+
+    <script>
+        const aadharInput = document.getElementById('aadhar');
+        const photoInput = document.getElementById('photo');
+        const aadharFeedback = document.getElementById('aadhar-feedback');
+        const photoFeedback = document.getElementById('photo-feedback');
+        const photoPreview = document.getElementById('photo-preview');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const liveImageInput = document.getElementById('live_image_input');
+
+        // Aadhaar number validation
+        aadharInput.addEventListener('input', function () {
+            const value = aadharInput.value.trim();
+            if (/^\d{12}$/.test(value)) {
+                aadharFeedback.textContent = "✅ Aadhaar number is valid.";
+                aadharFeedback.className = "valid-message";
+            } else {
+                aadharFeedback.textContent = "❌ Aadhaar number must be exactly 12 digits.";
+                aadharFeedback.className = "error-message";
+            }
+        });
+
+        // Aadhaar photo preview and validation
+        photoInput.addEventListener('change', function () {
+            const file = photoInput.files[0];
+            if (!file) return;
+
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                photoFeedback.textContent = "❌ Only JPG, JPEG, or PNG image files are allowed.";
+                photoPreview.style.display = "none";
+            } else {
+                photoFeedback.textContent = "";
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Access webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Could not access camera: " + err.message);
+            });
+
+        // Capture webcam frame and convert to Base64
+        function capture() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            liveImageInput.value = dataUrl;
+            alert("✅ Live face captured successfully.");
+        }
+
+        // Final form validation
+        function validateForm() {
+            const aadhar = aadharInput.value.trim();
+            const photo = photoInput.files[0];
+            const liveImage = liveImageInput.value;
+
+            if (!/^\d{12}$/.test(aadhar)) {
+                alert("❌ Aadhaar number must be exactly 12 digits.");
+                return false;
+            }
+
+            if (!photo || !['image/jpeg', 'image/png', 'image/jpg'].includes(photo.type)) {
+                alert("❌ Please upload a valid face image.");
+                return false;
+            }
+
+            if (!liveImage) {
+                alert("❌ Please capture your live face before submitting.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

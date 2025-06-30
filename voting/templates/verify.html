@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Voter Verification</title>
+</head>
+<body>
+
+<h2>Voter Verification</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Enter Aadhaar Number:</label>
+    <input type="text" name="aadhaar_number" required><br>
+
+    <!-- Camera Section -->
+    <div>
+        <video id="video" width="320" height="240" autoplay></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+    
+    <button type="button" onclick="capturePhoto()">Capture Photo</button>
+
+    <!-- Hidden Input Field to Send Captured Image -->
+    <input type="hidden" name="face_photo" id="captured_image">
+
+    <button type="submit">Verify</button>
+</form>
+
+<script>
+    const video = document.getElementById('video');
+
+    // Access User's Webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => console.error("Error accessing camera: ", err));
+
+    function capturePhoto() {
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert Image to Base64
+        const imageData = canvas.toDataURL('image/png');
+        document.getElementById('captured_image').value = imageData;
+    }
+</script>
+
+</body>
+</html>
