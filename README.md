@@ -55,7 +55,7 @@ A secure and accessible online voting system where users can cast their votes us
 ### 1. Clone the repo
 
 
-git clone https://github.com/Bavya20/Smart-E-voting-System.git , 
+git clone https://github.com/Bavya20/Smart-E-voting-System.git
 cd Smart-E-voting-System
 
 ---
